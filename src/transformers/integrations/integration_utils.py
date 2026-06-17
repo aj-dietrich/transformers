@@ -393,7 +393,14 @@ def run_hp_search_ray(trainer, n_trials: int, direction: str, **kwargs) -> BestR
         if is_datasets_available():
             import datasets.load
 
-            dynamic_modules_path = os.path.join(datasets.load.init_dynamic_modules(), "__init__.py")
+            # OLD CODE:
+            #dynamic_modules_path = os.path.join(datasets.load.init_dynamic_modules(), "__init__.py")
+            modules_dir = datasets.config.HF_MODULES_CACHE
+            os.makedirs(modules_dir, exist_ok=True)
+            dynamic_modules_path = os.path.join(modules_dir, "init.py")
+            Path(dynamic_modules_path).touch(exist_ok=True)
+            # END CHANGE
+            
             # load dynamic_modules from path
             spec = importlib.util.spec_from_file_location("datasets_modules", dynamic_modules_path)
             datasets_modules = importlib.util.module_from_spec(spec)
