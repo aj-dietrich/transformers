@@ -299,7 +299,7 @@ def run_hp_search_ray(trainer, n_trials: int, direction: str, **kwargs) -> BestR
 
         local_trainer.objective = None
 
-        checkpoint = ray.train.get_checkpoint()
+        checkpoint = ray.tune.get_checkpoint()
         if checkpoint:
             # Upon trial resume, the local_trainer's objective gets reset to None.
             # If `local_trainer.train` is a noop (training has already reached
