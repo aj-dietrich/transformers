@@ -285,9 +285,13 @@ def run_hp_search_optuna(trainer, n_trials: int, direction: str, **kwargs) -> Be
 
 
 def run_hp_search_ray(trainer, n_trials: int, direction: str, **kwargs) -> BestRun:
-    import ray
-    import ray.train
+    #import ray
+    #import ray.train
 
+    # ADDED
+    import ray.tune
+    #
+    
     def _objective(trial: dict, local_trainer):
         try:
             from transformers.utils.notebook import NotebookProgressCallback
@@ -299,7 +303,9 @@ def run_hp_search_ray(trainer, n_trials: int, direction: str, **kwargs) -> BestR
 
         local_trainer.objective = None
 
+        # ADDED
         checkpoint = ray.tune.get_checkpoint()
+        #
         if checkpoint:
             # Upon trial resume, the local_trainer's objective gets reset to None.
             # If `local_trainer.train` is a noop (training has already reached
@@ -323,8 +329,10 @@ def run_hp_search_ray(trainer, n_trials: int, direction: str, **kwargs) -> BestR
 
             with tempfile.TemporaryDirectory() as temp_checkpoint_dir:
                 local_trainer._tune_save_checkpoint(checkpoint_dir=temp_checkpoint_dir)
-                checkpoint = ray.train.Checkpoint.from_directory(temp_checkpoint_dir)
-                ray.train.report(metrics, checkpoint=checkpoint)
+                #checkpoint = ray.train.Checkpoint.from_directory(temp_checkpoint_dir)
+                #ray.train.report(metrics, checkpoint=checkpoint)
+                checkpoint = ray.tune.Checkpoint.from_directory(temp_checkpoint_dir)
+                ray.tune.report(metrics, checkpoint=checkpoint)
 
     if not trainer._memory_tracker.skip_memory_metrics:
         from ..trainer_utils import TrainerMemoryTracker
